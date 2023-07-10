@@ -2,22 +2,22 @@ const express = require('express');
 const router = express.Router();
 
 const comments = require("../models");
-const index = require("../models")
-const posts = require("../models");
+const index = require("../models");
+const posts = require("../models").posts;
 const authMiddleware = require('../middleware/authMiddleware');
 
 // localhost:3000/api/about GET
 router.post("/posts",authMiddleware, async (req, res) => {
-  // console.log("test")
-  // const { userId } = res.locals.user;
-  // const {title ,content} = req.body;
-  // const post = await posts.create({
-  //   userId : userId,
-  //   title,
-  //   content,
-  // })
+  console.log("test")
+  const { userId } = res.locals.user;
+  const {title ,content} = req.body;
+  const post = await posts.create({
+    userId : userId,
+    title,
+    content,
+  })
 
-  // return res.status(201).json({ data: post });
+  return res.status(201).json({ data: post });
 });
 
 router.get("/posts", (req, res) => {
