@@ -35,8 +35,14 @@ router.get("/posts", async (req, res) => {
     return res.status(200).json({ data: post });
   });
 
-router.get("/posts/:_postId", (req, res) => {
-    res.send("goods.js about PATH");
+router.get("/posts/:postId", async (req, res) => {
+  const { postId } = req.params;
+  console.log(postId);
+  const post = await posts.findOne({
+    attributes: ["postId",'title', 'content', 'createdAt'],
+    where : { postId }
+  });
+  return res.status(200).json({ data: post });
   });
 
 
