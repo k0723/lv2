@@ -3,6 +3,7 @@ const router = express.Router();
 
 const comments = require("../models");
 const index = require("../models");
+const users = require("../models").users;
 const posts = require("../models").posts;
 const authMiddleware = require('../middleware/authMiddleware');
 
@@ -20,8 +21,18 @@ router.post("/posts",authMiddleware, async (req, res) => {
   return res.status(201).json({ data: post });
 });
 
-router.get("/posts", (req, res) => {
-    res.send("goods.js about PATH");
+router.get("/posts", async (req, res) => {
+    const post = await posts.findAll({
+      attributes: ['title', 'content', 'createdAt'],
+      include: [
+        {
+          model: users,
+          attributes: ['nickname'],
+        },
+      ],
+      order: [['createdAt', 'DESC']],
+    });
+    return res.status(200).json({ data: post });
   });
 
 router.get("/posts/:_postId", (req, res) => {
