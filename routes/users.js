@@ -7,7 +7,7 @@ const {users} = require("../models")
 // localhost:3000/api/about GET
 router.post("/signup", async (req, res) =>  {
     const { nickname, password } = req.body;
-    const currentUsers = await users.findAll({ where: { nickname } });
+    const currentUsers = await users.findOne({ where: { nickname } });
     if (currentUsers) {
       return res.status(409).json({ message: "이미 존재하는 이메일입니다." });
     }
