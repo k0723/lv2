@@ -15,8 +15,8 @@ router.post("/comments/:postsId",authMiddleware, async (req, res) => {
   const { postsId } = req.params;
   const {comment} = req.body;
   const post = await comments.create({
-    userId : userId,
-    postId : postsId,
+    userid : userId,
+    postid : postsId,
     comment,
   })
 
