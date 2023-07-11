@@ -38,13 +38,30 @@ router.get("/comments/:postsId",async (req, res) => {
     return res.status(200).json({ data: comment });
   });
 
-router.get("/comments/:_commentsId", (req, res) => {
-    res.send("goods.js about PATH");
-  });
+router.put("/comments/:commentId", authMiddleware ,async(req, res) => {
 
+  const { commentId } = req.params;
+  const { userId } = res.locals.user;
+  const { comment } = req.body;
 
-router.put("/comments/:_commentsId", (req, res) => {
-    res.send("goods.js about PATH");
+  const commentsfind = await comments.findOne({ where: { commentId } });
+
+  if (!commentsfind) {
+    return res.status(404).json({ message: "댓글이 존재하지 않습니다." });
+  } else if (commentsfind.userid !== userId) {
+    return res.status(401).json({ message: "권한이 없습니다." });
+  }
+
+  await posts.update(
+    { comment }, 
+    {
+      where: {
+        [Op.and]: [{ commentId}],
+      }
+    }
+  );
+
+  return res.status(200).json({ data: "게시글이 수정되었습니다." });
   });
 
 router.delete("/posts/:_postId", (req, res) => {
