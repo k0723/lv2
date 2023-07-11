@@ -23,8 +23,8 @@ module.exports = async (req, res, next) => {
   } catch (error) {
     console.log(error);
     res.clearCookie("authorization");
-    return res.status(401).json({
-      message: "비정상적인 요청입니다."
+    return res.status(403).json({
+      message: "비정상적인 쿠키입니다."
     });
   }
 }
