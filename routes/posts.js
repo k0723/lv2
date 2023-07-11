@@ -9,7 +9,6 @@ const authMiddleware = require('../middleware/authMiddleware');
 const { Op } = require("sequelize");
 
 router.post("/posts",authMiddleware, async (req, res) => {
-  console.log("test")
   const { userId } = res.locals.user;
   const {title ,content} = req.body;
   const post = await posts.create({
