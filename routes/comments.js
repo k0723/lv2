@@ -23,14 +23,19 @@ router.post("/comments/:postsId",authMiddleware, async (req, res) => {
   return res.status(201).json({ data: post });
 });
 
-router.get("/comments/:postsId", (req, res) => {
+router.get("/comments/:postsId",async (req, res) => {
     const {postsId} = req.params;
-    console.log(postsId)
-  
-    console.log("params",params);
-  
-    res.status(200).json({});
-    res.send("goods.js about PATH");
+    const comment = await comments.findAll({
+      attributes: ['comment', 'createdAt', 'updatedAt' ],
+      include: [
+        {
+          model: users,
+          attributes: ['nickname'],
+        },
+      ],
+      order: [['createdAt', 'DESC']],
+    });
+    return res.status(200).json({ data: comment });
   });
 
 router.get("/comments/:_commentsId", (req, res) => {
