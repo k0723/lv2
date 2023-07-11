@@ -64,8 +64,25 @@ router.put("/comments/:commentId", authMiddleware ,async(req, res) => {
   return res.status(200).json({ data: "게시글이 수정되었습니다." });
   });
 
-router.delete("/posts/:_postId", (req, res) => {
-    res.send("goods.js about PATH");
-  });
+  router.delete("/comments/:commentId",authMiddleware,async (req, res) => {
+    const { commentId } = req.params;
+    const { userId } = res.locals.user;
+
+    const commentsdel = await comments.findOne({ where: { commentId } });
+
+    if (!commentsdel) {
+      return res.status(404).json({ message: "게시글이 존재하지 않습니다." });
+    } else if (commentsdel.userid !== userId) {
+      return res.status(401).json({ message: "권한이 없습니다." });
+    }
+
+    await commentsdel.destroy({
+      where: {
+        [Op.and]: [{ commentId }, { userid: userId }],
+      }
+    });
+
+    return res.status(200).json({ data: "게시글이 삭제되었습니다." });
+    });
 
 module.exports = router
