@@ -10,13 +10,13 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      this.belongsTo(models.users, { // 2. Users 모델에게 1:1 관계 설정을 합니다.
-        targetKey: 'userId', // 3. Users 모델의 userId 컬럼을
-        foreignKey: 'userId', // 4. UserInfos 모델의 UserId 컬럼과 연결합니다.
+      this.belongsTo(models.users, { 
+        targetKey: 'userId', 
+        foreignKey: 'userId', 
       });
-      this.hasOne(models.posts, { // 2. UserInfos 모델에게 1:1 관계 설정을 합니다.
-        sourceKey: 'postId', // 3. Users 모델의 userId 컬럼을
-        foreignKey: 'postId', // 4. UserInfos 모델의 UserId 컬럼과 연결합니다.
+      this.hasOne(models.posts, { 
+        sourceKey: 'postId', 
+        foreignKey: 'postId', 
       });
       // define association here
     }

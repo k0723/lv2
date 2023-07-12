@@ -5,6 +5,7 @@ const comments = require("../models");
 const index = require("../models");
 const users = require("../models").users;
 const posts = require("../models").posts;
+const likes = require("../models").like;
 const authMiddleware = require('../middleware/authMiddleware');
 const { Op } = require("sequelize");
 
@@ -34,9 +35,9 @@ router.post("/posts",authMiddleware, async (req, res) => {
   const post = await posts.create({
     userId : userId,
     title,
-    content,
+    content
   })
-  if(!psot)
+  if(!post)
   {
     return res.status(400).json({ "errorMessage" : "게시글 작성의 실패하였습니다."  });
   }
@@ -146,5 +147,66 @@ router.put("/posts/:postId", authMiddleware, async (req, res) => {
         return false; // 스페이스 없는 경우
     } 
   }
+
+  // 좋아요 제작 하기 
+
+  router.put("/posts/:postId/like",authMiddleware, async (req, res) => {
+    const { userId } = res.locals.user;
+    const { postId } = req.params;
+    if(!userId)
+    {
+      return res.status(403).json({ "errorMessage" : "로그인이 필요한 기능입니다." });
+    }
+  
+    const post = await posts.findOne({ where: { postId } });
+    const likeAdd = await posts.findOne({
+      attributes: ['title', 'createdAt','updatedAt'],
+    });
+    if(!post)
+    {
+      return res.status(403).json({ "errorMessage" : "게시글이 존재하지 않습니다.." });
+    }
+
+    await posts.update(
+      { like : increment}, 
+      {
+        where: {
+          [Op.and]: [{ postId }]
+        }
+      }
+    );
+
+    if(!posts)
+    {
+      return res.status(400).json({ "errorMessage" : "좋아요 실패."  });
+    }
+  
+    else
+    {
+      return res.status(201).json({ "message": "좋아요." });
+    }
+  });
+
+  // 좋아요 순으로 조회 
+
+  router.get("/posts", async (req, res) => {
+    const post = await posts.findAll({
+      attributes: ['title', 'createdAt','updatedAt'],
+      include: [
+        {
+          model: users,
+          attributes: ['nickname'],
+        },
+      ],
+      order: [['createdAt', 'DESC']],
+    });
+    if(!post)
+    {
+      return res.status(400).json({ "errorMessage" : "게시글 조회의 실패하였습니다."  });
+    }
+    else{
+      return res.status(200).json({ data: post });
+    }
+  });
 
   module.exports = router
