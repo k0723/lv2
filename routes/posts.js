@@ -150,47 +150,46 @@ router.put("/posts/:postId", authMiddleware, async (req, res) => {
 
   // 좋아요 제작 하기 
 
-  router.put("/posts/:postId/like",authMiddleware, async (req, res) => {
+  router.post("/posts/:postId/like",authMiddleware, async (req, res) => {
     const { userId } = res.locals.user;
     const { postId } = req.params;
+
     if(!userId)
     {
       return res.status(403).json({ "errorMessage" : "로그인이 필요한 기능입니다." });
     }
-  
-    const post = await posts.findOne({ where: { postId } });
-    const likeAdd = await posts.findOne({
-      attributes: ['title', 'createdAt','updatedAt'],
+    
+    const post = await posts.findOne({
+      where : { postId }
     });
+
+
     if(!post)
     {
       return res.status(403).json({ "errorMessage" : "게시글이 존재하지 않습니다.." });
     }
 
-    await posts.update(
-      { like : increment}, 
-      {
-        where: {
-          [Op.and]: [{ postId }]
-        }
-      }
-    );
+    const like = await likes.create({
+      userid : userId,
+      postid : postId,
+      like : 1,
+    })
 
-    if(!posts)
+    if(!like)
     {
       return res.status(400).json({ "errorMessage" : "좋아요 실패."  });
     }
   
     else
     {
-      return res.status(201).json({ "message": "좋아요." });
+      return res.status(201).json({ "message": "좋아요 성공." });
     }
   });
 
   // 좋아요 순으로 조회 
 
   router.get("/posts", async (req, res) => {
-    const post = await posts.findAll({
+    const post = await likes.findAll({
       attributes: ['title', 'createdAt','updatedAt'],
       include: [
         {
